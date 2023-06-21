@@ -8,12 +8,17 @@ from option import args
 from trainer import Trainer
 
 torch.manual_seed(args.seed)
+print(f"Args: {args}")
 checkpoint = utility.checkpoint(args)
+
+print(f"Checkpoint {checkpoint}")
+
 
 def main():
     global model
-    if args.data_test == ['video']:
+    if args.data_test == ["video"]:
         from videotester import VideoTester
+
         model = model.Model(args, checkpoint)
         t = VideoTester(args, model, checkpoint)
         t.test()
@@ -29,5 +34,6 @@ def main():
 
             checkpoint.done()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()
