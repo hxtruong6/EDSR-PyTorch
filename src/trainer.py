@@ -81,7 +81,7 @@ class Trainer:
         self.error_last = self.loss.log[-1, -1]
         self.optimizer.schedule()
 
-    def test(self):
+    def test(self, output_image: str = None):
         torch.set_grad_enabled(False)
 
         epoch = self.optimizer.get_last_epoch()
@@ -96,6 +96,7 @@ class Trainer:
             for idx_scale, scale in enumerate(self.scale):
                 d.dataset.set_scale(idx_scale)
                 for lr, hr, filename in tqdm(d, ncols=80):
+                    # print("\n--------- filename: ", filename, output_image)
                     lr, hr = self.prepare(lr, hr)
                     sr = self.model(lr, idx_scale)
                     sr = utility.quantize(sr, self.args.rgb_range)
@@ -108,7 +109,9 @@ class Trainer:
                         save_list.extend([lr, hr])
 
                     if self.args.save_results:
-                        self.ckp.save_results(d, filename[0], save_list, scale)
+                        self.ckp.save_results(
+                            d, filename[0], save_list, scale, output_image
+                        )
 
                 self.ckp.log[-1, idx_data, idx_scale] /= len(d)
                 best = self.ckp.log.max(0)
